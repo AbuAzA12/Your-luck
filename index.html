@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" id="htmlTag">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Your luck is random</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Tajawal', sans-serif;
+    }
+
+    body {
+      background: linear-gradient(135deg, #8e2de2 0%, #4a00e0 100%);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: white;
+      padding: 20px;
+    }
+
+    .container {
+      text-align: center;
+      padding: 2.5rem;
+      background: rgba(0, 0, 0, 0.35);
+      border-radius: 25px;
+      backdrop-filter: blur(12px);
+      max-width: 680px;
+      width: 95%;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    }
+
+    h1 {
+      font-size: 2.2rem;
+      margin-bottom: 1.8rem;
+      text-shadow: 0 2px 5px rgba(0,0,0,0.4);
+      font-weight: 700;
+    }
+
+    .number {
+      font-size: 2.6rem;
+      font-weight: bold;
+      margin: 1.2rem 0;
+      color: black; /* اللون الافتراضي: أسود */
+      text-shadow: none;
+      word-wrap: break-word;
+      padding: 0 10px;
+      transition: all 0.6s ease;
+    }
+
+    .number.glow {
+      color: white;
+      text-shadow: 0 0 15px rgba(255, 255, 255, 0.9),
+                   0 0 30px rgba(255, 255, 255, 0.7),
+                   0 0 45px rgba(255, 255, 255, 0.5);
+    }
+
+    .advice {
+      font-size: 1.4rem;
+      margin: 1.5rem 0;
+      line-height: 1.6;
+      font-weight: 500;
+    }
+
+    .verse {
+      font-size: 1.3rem;
+      margin: 1.2rem 0;
+      line-height: 1.7;
+      font-style: normal;
+      color: #ffe066;
+    }
+
+    .verse-ref {
+      font-size: 1rem;
+      margin: 0.5rem 0;
+      opacity: 0.9;
+    }
+
+    .example {
+      font-size: 1.15rem;
+      margin: 1.5rem 0;
+      line-height: 1.7;
+      background: rgba(255, 255, 255, 0.15);
+      padding: 1rem;
+      border-radius: 15px;
+      font-style: italic;
+    }
+
+    button {
+      background: #ff2a6d;
+      color: white;
+      border: none;
+      padding: 14px 32px;
+      font-size: 1.3rem;
+      border-radius: 50px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+      font-weight: bold;
+      margin-top: 1rem;
+    }
+
+    button:hover {
+      background: #ff0055;
+      transform: translateY(-4px);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+    }
+
+    .lang-select {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      margin-top: 2rem;
+      flex-wrap: wrap;
+    }
+
+    .lang-btn {
+      padding: 12px 18px;
+      font-size: 1rem;
+      background: rgba(255,255,255,0.2);
+      border: 2px solid white;
+      color: white;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.2s;
+      min-width: 120px;
+    }
+
+    .lang-btn:hover {
+      background: rgba(255,255,255,0.4);
+      transform: scale(1.03);
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&family=Roboto:wght@400;700&family=Montserrat:wght@400;700&family=Open+Sans:wght@400;700&display=swap');
+  </style>
+</head>
+<body>
+  <!-- شاشة اختيار اللغة -->
+  <div class="container" id="langScreen">
+    <h1>اختر لغتك / Choose your language</h1>
+    <div class="lang-select">
+      <button class="lang-btn" onclick="setLanguage('ar')">العربية</button>
+      <button class="lang-btn" onclick="setLanguage('en')">English</button>
+      <button class="lang-btn" onclick="setLanguage('fr')">Français</button>
+      <button class="lang-btn" onclick="setLanguage('es')">Español</button>
+      <button class="lang-btn" onclick="setLanguage('de')">Deutsch</button>
+    </div>
+  </div>
+
+  <!-- شاشة الحظ -->
+  <div class="container hidden" id="luckScreen">
+    <h1 id="mainTitle">Your luck is random</h1>
+    <div class="number" id="number">?</div>
+    <div class="advice" id="advice">اضغط الزر لاكتشاف حظك اليوم</div>
+    <div class="verse" id="verse"></div>
+    <div class="verse-ref" id="verseRef"></div>
+    <div class="example" id="example"></div>
+    <button id="generateBtn" onclick="generateLuck()">اكتشف حظك</button>
+  </div>
+
+  <script>
+    const translations = {
+      ar: {
+        title: "Your luck is random",
+        generateBtn: "اكتشف حظك",
+        placeholder: "اضغط الزر لاكتشاف حظك اليوم",
+         [
+          {
+            advice: "ثق بالله، فهو خير الحاسبين.",
+            verse: "وَمَن يَتَوَكَّلْ عَلَى اللَّهِ فَهُوَ حَسْبُهُ",
+            ref: "سورة الطلاق، الآية 3",
+            example: "مثلًا: عندما تواجه قرارًا صعبًا في عملك أو دراستك، لا تقلق كثيرًا، بل اتخذ قرارك بعد الاستخارة والتفكير، ثم توكل على الله واطمئن أن ما كتبه الله لك هو الأفضل."
+          },
+          {
+            advice: "لا تجزع من ضيق، فمع العسر يسرًا.",
+            verse: "فَإِنَّ مَعَ الْعُسْرِ يُسْرًا، إِنَّ مَعَ الْعُسْرِ يُسْرًا",
+            ref: "سورة الشرح، الآيتان 5-6",
+            example: "مثلًا: إذا فقدت وظيفتك أو فشلت في امتحان، تذكّر أن هذه لحظة عُسر، لكن بعدها مباشرة قد تأتيك فرصة أفضل لم تكن تتوقعها."
+          }
+        ]
+      },
+      en: {
+        title: "Your luck is random",
+        generateBtn: "Discover your luck",
+        placeholder: "Click the button to discover your luck today",
+         [
+          {
+            advice: "Trust in God; He is sufficient for you.",
+            verse: "\"And whoever relies upon Allah – then He is sufficient for him.\"",
+            ref: "Quran, At-Talaq 65:3",
+            example: "For example: When facing a tough decision at work or school, don’t panic. Make your choice after reflection and prayer, then trust that what God has written for you is best."
+          },
+          {
+            advice: "Do not despair in hardship; with difficulty comes ease.",
+            verse: "\"Indeed, with hardship comes ease. Indeed, with hardship comes ease.\"",
+            ref: "Quran, Ash-Sharh 94:5-6",
+            example: "For instance: If you lose your job or fail an exam, remember this is a moment of difficulty—but right after, a better opportunity may come unexpectedly."
+          }
+        ]
+      },
+      fr: {
+        title: "Votre chance est aléatoire",
+        generateBtn: "Découvrez votre chance",
+        placeholder: "Cliquez sur le bouton pour découvrir votre chance aujourd'hui",
+         [
+          {
+            advice: "Ayez confiance en Dieu ; Il vous suffit.",
+            verse: "« Et quiconque se confie en Allah, Il lui suffit. »",
+            ref: "Coran, At-Talaq 65:3",
+            example: "Par exemple : face à une décision difficile au travail ou à l’école, ne paniquez pas. Prenez votre décision après réflexion et prière, puis ayez confiance que ce que Dieu a écrit pour vous est le meilleur."
+          },
+          {
+            advice: "Ne désespérez pas dans l’adversité ; après la difficulté vient la facilité.",
+            verse: "« Car avec la difficulté vient la facilité. Oui, avec la difficulté vient la facilité. »",
+            ref: "Coran, Ash-Sharh 94:5-6",
+            example: "Par exemple : si vous perdez votre emploi ou échouez à un examen, souvenez-vous que c’est un moment de difficulté — mais une meilleure opportunité peut arriver juste après."
+          }
+        ]
+      },
+      es: {
+        title: "Tu suerte es aleatoria",
+        generateBtn: "Descubre tu suerte",
+        placeholder: "Haz clic en el botón para descubrir tu suerte hoy",
+         [
+          {
+            advice: "Confía en Dios; Él te basta.",
+            verse: "«Y quien confíe en Alá, Él le basta.»",
+            ref: "Corán, At-Talaq 65:3",
+            example: "Por ejemplo: al enfrentar una decisión difícil en el trabajo o en la escuela, no entres en pánico. Toma tu decisión tras reflexionar y rezar, y confía en que lo que Dios ha escrito para ti es lo mejor."
+          },
+          {
+            advice: "No desesperes en la adversidad; tras la dificultad viene la facilidad.",
+            verse: "«Ciertamente, con la dificultad viene la facilidad. ¡Sí, con la dificultad viene la facilidad!»",
+            ref: "Corán, Ash-Sharh 94:5-6",
+            example: "Por ejemplo: si pierdes tu trabajo o repruebas un examen, recuerda que este es un momento de dificultad, pero justo después puede llegar una oportunidad mejor inesperadamente."
+          }
+        ]
+      },
+      de: {
+        title: "Dein Glück ist zufällig",
+        generateBtn: "Entdecke dein Glück",
+        placeholder: "Klicke auf den Button, um dein Glück heute zu entdecken",
+         [
+          {
+            advice: "Vertraue auf Gott; Er genügt dir.",
+            verse: "„Und wer auf Allah vertraut – Ihm genügt er.“",
+            ref: "Quran, At-Talaq 65:3",
+            example: "Zum Beispiel: Wenn du vor einer schwierigen Entscheidung bei der Arbeit oder in der Schule stehst, gerate nicht in Panik. Triff deine Wahl nach Nachdenken und Gebet, und vertraue darauf, dass das, was Gott für dich bestimmt hat, das Beste ist."
+          },
+          {
+            advice: "Verzweifle nicht in der Not; mit der Schwierigkeit kommt die Erleichterung.",
+            verse: "„Gewiss, mit der Schwierigkeit kommt die Erleichterung. Ja, mit der Schwierigkeit kommt die Erleichterung.“",
+            ref: "Quran, Ash-Sharh 94:5-6",
+            example: "Zum Beispiel: Wenn du deinen Job verlierst oder eine Prüfung nicht bestehst, denke daran, dass dies ein Moment der Schwierigkeit ist – aber danach kann unerwartet eine bessere Gelegenheit kommen."
+          }
+        ]
+      }
+    };
+
+    let currentLang = 'ar';
+
+    function setLanguage(lang) {
+      currentLang = lang;
+      const htmlTag = document.getElementById('htmlTag');
+      
+      if (lang === 'ar') {
+        htmlTag.setAttribute('dir', 'rtl');
+        htmlTag.setAttribute('lang', 'ar');
+        document.body.style.fontFamily = "'Tajawal', sans-serif";
+      } else {
+        htmlTag.setAttribute('dir', 'ltr');
+        htmlTag.setAttribute('lang', lang);
+        if (lang === 'fr') {
+          document.body.style.fontFamily = "'Montserrat', sans-serif";
+        } else if (lang === 'de' || lang === 'es') {
+          document.body.style.fontFamily = "'Open Sans', sans-serif";
+        } else {
+          document.body.style.fontFamily = "'Roboto', sans-serif";
+        }
+      }
+
+      document.getElementById('langScreen').classList.add('hidden');
+      document.getElementById('luckScreen').classList.remove('hidden');
+
+      const trans = translations[lang];
+      document.getElementById('mainTitle').textContent = trans.title;
+      document.getElementById('generateBtn').textContent = trans.generateBtn;
+      document.getElementById('advice').textContent = trans.placeholder;
+      document.getElementById('verse').textContent = '';
+      document.getElementById('verseRef').textContent = '';
+      document.getElementById('example').textContent = '';
+      
+      // إعادة الرقم إلى الحالة الافتراضية (أسود)
+      const numberEl = document.getElementById('number');
+      numberEl.textContent = '?';
+      numberEl.classList.remove('glow');
+    }
+
+    function formatNumber(num) {
+      const locales = {
+        ar: 'ar-EG',
+        en: 'en-US',
+        fr: 'fr-FR',
+        es: 'es-ES',
+        de: 'de-DE'
+      };
+      return num.toLocaleString(locales[currentLang] || 'en-US');
+    }
+
+    function generateLuck() {
+      const number = Math.floor(Math.random() * 1000000000) + 1;
+      const trans = translations[currentLang];
+      const item = trans.data[Math.floor(Math.random() * trans.data.length)];
+
+      const numberEl = document.getElementById('number');
+      numberEl.textContent = formatNumber(number);
+      
+      // إضافة تأثير الإضاءة
+      numberEl.classList.remove('glow');
+      // استخدام setTimeout صغير لتفعيل التأثير حتى لو كان الرقم نفسه
+      setTimeout(() => {
+        numberEl.classList.add('glow');
+      }, 10);
+
+      document.getElementById('advice').textContent = item.advice;
+      document.getElementById('verse').textContent = 
+        currentLang === 'ar' ? "﴿" + item.verse + "﴾" : item.verse;
+      document.getElementById('verseRef').textContent = item.ref;
+      const prefix = 
+        currentLang === 'ar' ? "مثال: " :
+        currentLang === 'fr' ? "Exemple : " :
+        currentLang === 'es' ? "Ejemplo: " :
+        currentLang === 'de' ? "Beispiel: " : "Example: ";
+      document.getElementById('example').textContent = prefix + item.example;
+    }
+  </script>
+</body>
+</html>

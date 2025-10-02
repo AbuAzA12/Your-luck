@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!<!DOCTYPE html>
 <html lang="ar" dir="rtl" id="htmlTag">
 <head>
   <meta charset="UTF-8" />
@@ -44,18 +44,10 @@
       font-size: 2.6rem;
       font-weight: bold;
       margin: 1.2rem 0;
-      color: black; /* اللون الافتراضي: أسود */
-      text-shadow: none;
+      color: #ffcc00;
+      text-shadow: 0 0 10px rgba(255,204,0,0.5);
       word-wrap: break-word;
       padding: 0 10px;
-      transition: all 0.6s ease;
-    }
-
-    .number.glow {
-      color: white;
-      text-shadow: 0 0 15px rgba(255, 255, 255, 0.9),
-                   0 0 30px rgba(255, 255, 255, 0.7),
-                   0 0 45px rgba(255, 255, 255, 0.5);
     }
 
     .advice {
@@ -142,7 +134,6 @@
   </style>
 </head>
 <body>
-  <!-- شاشة اختيار اللغة -->
   <div class="container" id="langScreen">
     <h1>اختر لغتك / Choose your language</h1>
     <div class="lang-select">
@@ -154,7 +145,6 @@
     </div>
   </div>
 
-  <!-- شاشة الحظ -->
   <div class="container hidden" id="luckScreen">
     <h1 id="mainTitle">Your luck is random</h1>
     <div class="number" id="number">?</div>
@@ -171,7 +161,7 @@
         title: "Your luck is random",
         generateBtn: "اكتشف حظك",
         placeholder: "اضغط الزر لاكتشاف حظك اليوم",
-         [
+        data: [  // ← هنا كانت المشكلة: ناقص "data:"
           {
             advice: "ثق بالله، فهو خير الحاسبين.",
             verse: "وَمَن يَتَوَكَّلْ عَلَى اللَّهِ فَهُوَ حَسْبُهُ",
@@ -190,7 +180,7 @@
         title: "Your luck is random",
         generateBtn: "Discover your luck",
         placeholder: "Click the button to discover your luck today",
-         [
+        data: [  // ← مضاف الآن
           {
             advice: "Trust in God; He is sufficient for you.",
             verse: "\"And whoever relies upon Allah – then He is sufficient for him.\"",
@@ -209,7 +199,7 @@
         title: "Votre chance est aléatoire",
         generateBtn: "Découvrez votre chance",
         placeholder: "Cliquez sur le bouton pour découvrir votre chance aujourd'hui",
-         [
+        data: [  // ← مضاف
           {
             advice: "Ayez confiance en Dieu ; Il vous suffit.",
             verse: "« Et quiconque se confie en Allah, Il lui suffit. »",
@@ -228,7 +218,7 @@
         title: "Tu suerte es aleatoria",
         generateBtn: "Descubre tu suerte",
         placeholder: "Haz clic en el botón para descubrir tu suerte hoy",
-         [
+        data: [  // ← مضاف
           {
             advice: "Confía en Dios; Él te basta.",
             verse: "«Y quien confíe en Alá, Él le basta.»",
@@ -247,7 +237,7 @@
         title: "Dein Glück ist zufällig",
         generateBtn: "Entdecke dein Glück",
         placeholder: "Klicke auf den Button, um dein Glück heute zu entdecken",
-         [
+        data: [  // ← مضاف
           {
             advice: "Vertraue auf Gott; Er genügt dir.",
             verse: "„Und wer auf Allah vertraut – Ihm genügt er.“",
@@ -296,11 +286,6 @@
       document.getElementById('verse').textContent = '';
       document.getElementById('verseRef').textContent = '';
       document.getElementById('example').textContent = '';
-      
-      // إعادة الرقم إلى الحالة الافتراضية (أسود)
-      const numberEl = document.getElementById('number');
-      numberEl.textContent = '?';
-      numberEl.classList.remove('glow');
     }
 
     function formatNumber(num) {
@@ -317,18 +302,9 @@
     function generateLuck() {
       const number = Math.floor(Math.random() * 1000000000) + 1;
       const trans = translations[currentLang];
-      const item = trans.data[Math.floor(Math.random() * trans.data.length)];
+      const item = trans.data[Math.floor(Math.random() * trans.data.length)]; // ← الآن trans.data موجود
 
-      const numberEl = document.getElementById('number');
-      numberEl.textContent = formatNumber(number);
-      
-      // إضافة تأثير الإضاءة
-      numberEl.classList.remove('glow');
-      // استخدام setTimeout صغير لتفعيل التأثير حتى لو كان الرقم نفسه
-      setTimeout(() => {
-        numberEl.classList.add('glow');
-      }, 10);
-
+      document.getElementById('number').textContent = formatNumber(number);
       document.getElementById('advice').textContent = item.advice;
       document.getElementById('verse').textContent = 
         currentLang === 'ar' ? "﴿" + item.verse + "﴾" : item.verse;
